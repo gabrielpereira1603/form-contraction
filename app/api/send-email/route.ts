@@ -17,7 +17,7 @@ export async function POST(req: Request) {
 
     await transporter.sendMail({
       from: `"${process.env.MAIL_FROM_NAME}" <${process.env.MAIL_FROM_ADDRESS}>`,
-      to: "dp1@ceopag.com.br",
+      to: "dp1@ceopag.com.br, dp@ceopag.com.br",
       subject: `Nova vaga cadastrada: ${body.cargo}`,
       html: `
         <div style="font-family: Arial, sans-serif; color: #333;">
