@@ -8,7 +8,6 @@ export default function Home() {
   const [message, setMessage] = useState("");
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
     const form = event.currentTarget as HTMLFormElement;
     setLoading(true);
     setMessage("");
@@ -53,7 +52,6 @@ export default function Home() {
             name="departamento"
             type="text"
             required
-            defaultValue="Tecnologia - João Silva"
             className="text-black w-full border border-gray-300 rounded-md p-3 mt-1 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           />
         </div>
@@ -64,7 +62,6 @@ export default function Home() {
             name="cargo"
             type="text"
             required
-            defaultValue="Desenvolvedor Fullstack"
             className="text-black w-full border border-gray-300 rounded-md p-3 mt-1 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           />
         </div>
@@ -74,7 +71,6 @@ export default function Home() {
           <textarea
             name="perfil"
             required
-            defaultValue="Experiência com Laravel, React e MySQL."
             className="text-black w-full border border-gray-300 rounded-md p-3 mt-1 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           />
         </div>
@@ -84,7 +80,6 @@ export default function Home() {
           <textarea
             name="atividades"
             required
-            defaultValue="Desenvolver e manter sistemas internos e integrações com APIs."
             className="text-black w-full border border-gray-300 rounded-md p-3 mt-1 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           />
         </div>
@@ -94,7 +89,6 @@ export default function Home() {
           <select
             name="contratacao"
             required
-            defaultValue="CLT"
             className="text-black w-full border border-gray-300 rounded-md p-3 mt-1 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           >
             <option value="CLT">CLT</option>
@@ -109,7 +103,6 @@ export default function Home() {
             type="number"
             min="1"
             required
-            defaultValue="2"
             className="text-black w-full border border-gray-300 rounded-md p-3 mt-1 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           />
         </div>
@@ -120,7 +113,6 @@ export default function Home() {
             name="admissao"
             type="date"
             required
-            defaultValue="2025-09-30"
             className="text-black w-full border border-gray-300 rounded-md p-3 mt-1 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           />
         </div>
@@ -129,7 +121,6 @@ export default function Home() {
           <label className="block text-gray-800 font-medium">Observação (opcional)</label>
           <textarea
             name="observacao"
-            defaultValue="Disponível para trabalho remoto parcial."
             className="text-black w-full border border-gray-300 rounded-md p-3 mt-1 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           />
         </div>
