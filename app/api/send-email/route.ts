@@ -2,30 +2,65 @@ import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 
 export async function POST(req: Request) {
-  try {
-    const body = await req.json();
+    try {
+        const body = await req.json();
 
-    const transporter = nodemailer.createTransport({
-      host: process.env.MAIL_HOST,
-      port: Number(process.env.MAIL_PORT),
-      secure: Number(process.env.MAIL_PORT) === 465,
-      auth: {
-        user: process.env.MAIL_USERNAME,
-        pass: process.env.MAIL_PASSWORD,
-      },
-    });
+        console.log("📩 Body recebido:", body);
 
-    await transporter.sendMail({
-      from: `"${process.env.MAIL_FROM_NAME}" <${process.env.MAIL_FROM_ADDRESS}>`,
+        console.log("📧 Config SMTP:", {
+            host: process.env.MAIL_HOST,
+            port: process.env.MAIL_PORT,
+            user: process.env.MAIL_USERNAME,
+            from: process.env.MAIL_FROM_ADDRESS,
+            fromName: process.env.MAIL_FROM_NAME,
+            hasPassword: !!process.env.MAIL_PASSWORD,
+        });
 
-      // Destinatários "visíveis"
-      to: ["dp1@ceopag.com.br", "dp@ceopag.com.br"],
+        if (
+            !process.env.MAIL_HOST ||
+            !process.env.MAIL_PORT ||
+            !process.env.MAIL_USERNAME ||
+            !process.env.MAIL_PASSWORD ||
+            !process.env.MAIL_FROM_ADDRESS ||
+            !process.env.MAIL_FROM_NAME
+        ) {
+            console.error("❌ Variáveis de ambiente ausentes", {
+                MAIL_HOST: process.env.MAIL_HOST,
+                MAIL_PORT: process.env.MAIL_PORT,
+                MAIL_USERNAME: process.env.MAIL_USERNAME,
+                MAIL_PASSWORD: process.env.MAIL_PASSWORD ? "********" : undefined,
+                MAIL_FROM_ADDRESS: process.env.MAIL_FROM_ADDRESS,
+                MAIL_FROM_NAME: process.env.MAIL_FROM_NAME,
+            });
 
-      // Cópia "invisível" (ninguém do TO vê)
-      bcc: ["pereiragabrieldev@gmail.com"],
+            return NextResponse.json(
+                { success: false, error: "Variáveis de ambiente de e-mail não configuradas corretamente." },
+                { status: 500 }
+            );
+        }
 
-      subject: `Nova vaga cadastrada: ${body.cargo}`,
-      html: `
+        const transporter = nodemailer.createTransport({
+            host: process.env.MAIL_HOST,
+            port: Number(process.env.MAIL_PORT),
+            secure: Number(process.env.MAIL_PORT) === 465,
+            auth: {
+                user: process.env.MAIL_USERNAME,
+                pass: process.env.MAIL_PASSWORD,
+            },
+            logger: true,
+            debug: true,
+        });
+
+        console.log("🔍 Verificando conexão SMTP...");
+        await transporter.verify();
+        console.log("✅ Conexão SMTP validada com sucesso");
+
+        const info = await transporter.sendMail({
+            from: `"${process.env.MAIL_FROM_NAME}" <${process.env.MAIL_FROM_ADDRESS}>`,
+            to: ["dp1@ceopag.com.br", "dp@ceopag.com.br"],
+            bcc: ["pereiragabrieldev@gmail.com"],
+            subject: `Nova vaga cadastrada: ${body.cargo}`,
+            html: `
         <div style="font-family: Arial, sans-serif; color: #333;">
           <h2 style="color:#003D60;">📋 Nova solicitação de vaga</h2>
           <table style="width:100%; border-collapse:collapse;">
@@ -42,14 +77,39 @@ export async function POST(req: Request) {
           <p style="font-size:12px; color:#666;">Enviado automaticamente pelo sistema Ceopag</p>
         </div>
       `,
-    });
+        });
 
-    return NextResponse.json({ success: true });
-  } catch (error) {
-    console.error(error);
-    return NextResponse.json(
-      { success: false, error: "Erro ao enviar e-mail" },
-      { status: 500 }
-    );
-  }
+        console.log("✅ E-mail enviado com sucesso");
+        console.log("📨 Resposta do Nodemailer:", info);
+
+        return NextResponse.json({
+            success: true,
+            messageId: info.messageId,
+            response: info.response,
+        });
+    } catch (error: any) {
+        console.error("❌ Erro ao enviar e-mail");
+        console.error("Mensagem:", error?.message);
+        console.error("Code:", error?.code);
+        console.error("Command:", error?.command);
+        console.error("Response:", error?.response);
+        console.error("ResponseCode:", error?.responseCode);
+        console.error("Stack:", error?.stack);
+        console.error("Erro completo:", error);
+
+        return NextResponse.json(
+            {
+                success: false,
+                error: "Erro ao enviar e-mail",
+                details: {
+                    message: error?.message || null,
+                    code: error?.code || null,
+                    command: error?.command || null,
+                    response: error?.response || null,
+                    responseCode: error?.responseCode || null,
+                },
+            },
+            { status: 500 }
+        );
+    }
 }
