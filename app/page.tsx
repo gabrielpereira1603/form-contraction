@@ -26,7 +26,7 @@ const formSchema = z.object({
     perfil: z.string().min(10, "Descreva melhor o perfil exigido."),
     atividades: z.string().min(10, "Descreva melhor as atividades."),
     contratacao: z.enum(["CLT", "PJ"]),
-    quantidade: z.coerce.number().min(1, "A quantidade deve ser no mínimo 1."),
+    quantidade: z.number().min(1, "A quantidade deve ser no mínimo 1."),
     admissao: z.string().min(1, "Informe a data de admissão."),
     observacao: z.string().optional(),
 });
@@ -39,6 +39,7 @@ export default function Home() {
 
     useEffect(() => {
         const savedTheme = localStorage.getItem("theme-mode") as ThemeMode | null;
+
         if (savedTheme === "dark" || savedTheme === "light") {
             setTheme(savedTheme);
             document.documentElement.classList.toggle("dark", savedTheme === "dark");
@@ -47,6 +48,7 @@ export default function Home() {
 
         const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
         const initialTheme: ThemeMode = prefersDark ? "dark" : "light";
+
         setTheme(initialTheme);
         document.documentElement.classList.toggle("dark", initialTheme === "dark");
     }, []);
@@ -98,11 +100,14 @@ export default function Home() {
             toast.success("Formulário enviado com sucesso.", {
                 description: "A solicitação foi encaminhada para os responsáveis.",
             });
-        } catch (error: any) {
+        } catch (error: unknown) {
+            const message =
+                error instanceof Error ? error.message : "Tente novamente em instantes.";
+
             console.error("Erro no envio:", error);
 
             toast.error("Falha ao enviar formulário.", {
-                description: error?.message || "Tente novamente em instantes.",
+                description: message,
             });
         }
     }
@@ -296,7 +301,7 @@ export default function Home() {
                                             type="number"
                                             min={1}
                                             className={`${inputClass} pl-11`}
-                                            {...register("quantidade")}
+                                            {...register("quantidade", { valueAsNumber: true })}
                                         />
                                     </div>
                                     {errors.quantidade && (

@@ -23,6 +23,7 @@ export async function POST(req: Request) {
             !process.env.MAIL_PASSWORD
         ) {
             console.error("❌ Variáveis SMTP ausentes");
+
             return NextResponse.json(
                 {
                     success: false,
@@ -106,18 +107,23 @@ export async function POST(req: Request) {
             message: "E-mail enviado com sucesso.",
             messageId: info.messageId,
         });
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error("❌ Erro ao enviar e-mail");
-        console.error("Mensagem:", error?.message);
-        console.error("Code:", error?.code);
-        console.error("Response:", error?.response);
-        console.error("ResponseCode:", error?.responseCode);
-        console.error("Stack:", error?.stack);
+
+        if (error instanceof Error) {
+            console.error("Mensagem:", error.message);
+            console.error("Stack:", error.stack);
+        } else {
+            console.error("Erro desconhecido:", error);
+        }
 
         return NextResponse.json(
             {
                 success: false,
-                error: error?.message || "Erro interno ao enviar e-mail.",
+                error:
+                    error instanceof Error
+                        ? error.message
+                        : "Erro interno ao enviar e-mail.",
             },
             { status: 500 }
         );
